@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<style>
+  .speech {border: 1px solid #DDD; width: 300px; padding: 0; margin: 0}
+  .speech input {border: 0; width: 240px; display: inline-block; height: 30px;}
+  .speech img {float: right; width: 40px }
+</style>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  </head>
+  <body>
+        <div>
+                <a href="#" id="start_button" onclick="startDictation(event)">Dictate</a>
+              </div>
+              
+              <div id="results">
+                <span id="final_span" class="final"></span>
+                <span id="interim_span" class="interim"></span>
+              </div>
+              
+              <script type="text/javascript">
+              var final_transcript = '';
+              var recognizing = false;
+              
+              if ('webkitSpeechRecognition' in window) {
+              
+                var recognition = new webkitSpeechRecognition();
+              
+                recognition.continuous = true;
+                recognition.interimResults = true;
+              
+                recognition.onstart = function() {
+                  recognizing = true;
+                };
+              
+                recognition.onerror = function(event) {
+                  console.log(event.error);
+                };
+              
+                recognition.onend = function() {
+                  recognizing = false;
+                };
+              
+                recognition.onresult = function(event) {
+                  var interim_transcript = '';
+                  for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                      final_transcript += event.results[i][0].transcript;
+                    } else {
+                      interim_transcript += event.results[i][0].transcript;
+                    }
+                  }
+                  final_transcript = capitalize(final_transcript);
+                  final_span.innerHTML = linebreak(final_transcript);
+                  interim_span.innerHTML = linebreak(interim_transcript);
+                  
+                };
+              }
+              
+              var two_line = /\n\n/g;
+              var one_line = /\n/g;
+              function linebreak(s) {
+                return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+              }
+              
+              function capitalize(s) {
+                return s.replace(s.substr(0,1), function(m) { return m.toUpperCase(); });
+              }
+              
+              function startDictation(event) {
+                if (recognizing) {
+                  recognition.stop();
+                  return;
+                }
+                final_transcript = '';
+                recognition.lang = 'en-US';
+                recognition.start();
+                final_span.innerHTML = '';
+                interim_span.innerHTML = '';
+              }
+              </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  </body>
+</html>
